@@ -5,7 +5,7 @@
 # modify it under the same terms as Perl itself.
 
 #This package represents the generic icecast object
-#which be used to make sources and listeners objects
+#which is used to make sources and listeners objects
 package Net::Icecast::IceObject;
 
 sub Net::Icecast::IceObject::new
@@ -59,18 +59,18 @@ use strict;
 use vars qw(@ISA @EXPORT @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 
 use Exporter;
-$VERSION = "1.00";
+$VERSION = "1.02";
 @ISA = qw(Exporter);
 
 @EXPORT = qw(Net::Icecast::new DESTROY set_oper sources listeners selection
 	     set modify allow deny kick);
 
-#To be connect you must give the host and the port of the computer
-#which contains the server and the password to be ADMIN, and the
-#functin gives you a connection to the server ($session->{socket})
-#The default proto is tcp
-#The answer of the socket must be read in order to empty the socket buffer.
-#Return 0 if you gave a bad password
+#To open a session, you must give the host and the port of the icecast
+#server and the password to be ADMIN, after that the
+#function gives you a connection to the server ($session->{socket})
+#The default protocol is tcp
+#The answer of the socket must be read in order to flush the socket buffer.
+#Return 0 if you gave a wrong password
 sub Net::Icecast::new
   {
     my $classname = shift;
@@ -92,7 +92,7 @@ sub Net::Icecast::new
     my $s = $session->{socket};
     print $s "ADMIN $pwd\n\n";
     my $ans = <$s>;
-    if( $ans =~ /Bad Password/ )
+    if( $ans =~ /Wrong Password/ )
       {
 	return 0;
       }
@@ -255,7 +255,7 @@ sub listeners
     return %hash;    
   }
 
-#Generic function called by the other functions
+#Generic function called by the other commands
 sub generic
   {   
     unless (@_ == 3) { die "defect of parameters\n"; }
@@ -286,30 +286,31 @@ sub generic
       }
   }
 
-#Icecast set command 
+#Command SET
 #The function receives the parameters that the user
-#should give to an icecast command 
+#should give to an icecast server
 #And it's the same for the other functions behind
 #For more details see the exemple!
 #The function "generic" returns you the answer, but only if there's
-#one answer, and you can make, if you want, tests on to see if there's
-#problems.For me it's not very interesting because the functions
-#are very simple and the answers are differents between versions of
-#icecast and between the problems the functions have.
+#one answer. For me it was not interesting to develop the
+#generic function because the functions that I used are very simple,
+#and the answers of the commands depends of the icecast version.
+#So the job is more difficult if you want to do an real 
+#'generic' function, that do not depend of the version of icecast.
 sub set
   {   
     my $session =shift;
-    unless (@_ == 1) { die "defect of parameters\n"; }
+    unless (@_ == 1) { die "defect of parameters in the command SET\n"; }
   
     unshift(@_,$session,"set");
     &generic(@_);
   }
 
-#Give the operator_password to be operator
+#Give the operator_password to become operator
 sub set_oper
   {
     my $session =shift;
-    unless (@_ == 1) { die "Doesn't contain password\n"; }
+    unless (@_ == 1) { die "Doesn't contain password to become operator\n"; }
 
     unshift(@_,$session,"oper");
     my $ans = &generic(@_);
@@ -324,7 +325,7 @@ sub set_oper
 sub modify
   {   
     my $session =shift;
-    unless (@_ == 1) { die "defect of parameters\n"; }
+    unless (@_ == 1) { die "defect of parameters in the command MODIFY\n"; }
 
     unshift(@_,$session,"modify");
     &generic(@_);
@@ -334,12 +335,12 @@ sub modify
 sub allow
   {
     my $session =shift;
-    unless (@_ == 1) { die "defect of parameters\n"; }
+    unless (@_ == 1) { die "defect of parameters in the command ALLOW\n"; }
 
     #The problem with the command 'allow ... list' is that I can't
     #say to the function when it must stop to read the socket!
     #They should add something like "End of allow ... listing"
-    if (@_ =~ /list /) { die "Operation not allowed\n"; }
+    if (@_ =~ /list /) { die "Operation not allowed in the command ALLOW\n"; }
 
     unshift(@_,$session,"allow");
     &generic(@_);
@@ -349,10 +350,10 @@ sub allow
 sub deny
   {
     my $session =shift;
-    unless (@_ == 1) { die "defect of parameters\n"; }
+    unless (@_ == 1) { die "defect of parameters in the command DENY\n"; }
 
     #The same problem that we have with allow
-    if (@_ =~ /list /) { die "Operation not allowed\n"; }
+    if (@_ =~ /list /) { die "Operation not allowed in the command DENY\n"; }
 
     unshift(@_,$session,"deny");
     &generic(@_);
@@ -362,7 +363,7 @@ sub deny
 sub kick
   {
     my $session =shift;
-    unless (@_ == 1) { die "defect of parameters\n"; }
+    unless (@_ == 1) { die "defect of parameters in the command KICK\n"; }
 
     unshift(@_,$session,"kick");
     &generic(@_);
@@ -372,7 +373,7 @@ sub kick
 sub selection
   {   
     my $session =shift;
-    unless (@_ == 1) { die "defect of parameters\n"; }
+    unless (@_ == 1) { die "defect of parameters in the command SELECTION\n"; }
     unshift(@_,$session,"select");
     &generic(@_);
   }
@@ -381,7 +382,7 @@ sub selection
 sub alias
   {
     my $session =shift;
-    unless (@_ == 1) { die "defect of parameters\n"; }
+    unless (@_ == 1) { die "defect of parameters in the command ALIAS\n"; }
 
     unshift(@_,$session,"alias");
     &generic(@_);
@@ -391,7 +392,7 @@ sub alias
 sub dir
   {
     my $session =shift;
-    unless (@_ == 1) { die "defect of parameters\n"; }
+    unless (@_ == 1) { die "defect of parameters in the command DIR\n"; }
 
     unshift(@_,$session,"dir");
     &generic(@_);
@@ -401,7 +402,7 @@ sub dir
 sub touch
   {
     my $session =shift;
-    unless (@_ == 0) { die "defect of parameters\n"; }
+    unless (@_ == 0) { die "defect of parameters in the command TOUCH\n"; }
     
     my $s = $session->{socket};
     print $s "touch\n";
@@ -412,7 +413,7 @@ sub touch
 sub status
   {
     my $session =shift;
-    unless (@_ == 1) { die "defect of parameters\n"; }
+    unless (@_ == 1) { die "defect of parameters in the command STATUS\n"; }
 
     unshift(@_,$session,"status");
     &generic(@_);
@@ -422,7 +423,7 @@ sub status
 sub debug
   {
     my $session =shift;
-    unless (@_ == 1) { die "defect of parameters\n"; }
+    unless (@_ == 1) { die "defect of parameters in the command DEBUG\n"; }
 
     unshift(@_,$session,"debug");
     &generic(@_);
@@ -435,7 +436,7 @@ __END__
 
 =head1 NAME
   
-Net::Icecast - Object oriented functions to run your icecast server.
+Net::Icecast - Object oriented functions to run your icecast server by bash operations.
 
 
 =head1 SYNOPSIS
@@ -447,12 +448,11 @@ require Net::Icecast;
 
 WARNING!!! This module can only be use if your icecast server is older than version 1.3.7
 
-The commands you're used to find in a icecast server are in this module (Not alls but only the ones i needed!).
-They can permit you to create programs which configure your icecast server.
+The commands you're used to find in an icecast server are in this module (Not all but only the ones i needed!).
+They can permit you to create programs that configure your icecast server by bash operations.
 If you find that there are importants functions that need to be add,
-as i said before, you can modify it under the same terms as Perl itself!
-(If you want more details about the functions see
-the icecast commands doc) 
+you can modify it under the same terms as Perl itself!
+(If you want more details about the functions see the icecast commands documentation) 
 
 So good fun...
 
@@ -468,54 +468,45 @@ id : source's id
 host : source's host
 
 =item mountpoint : source's mountpoint
-connect for : time of connection of the source 
+connect for : source connection time
 ip : source's ip
-song : song sends by the source
+song : song sent by the source
 
 =item Listeners object :
 Properties:
 id : listener's id
 host : listener's host
 mountpoint : listener's mountpoint
-connect for : time of connection of the listener 
+connect for : listener connection time
 source_id : listener's source id.
 
 =back
 
 =head1 METHODS
+To be connected to the icecast server as an admin
+Net::Icecast->new($host,$port,$admin_password)
 
-Net::Icecast->new($host,$port,$admin_password) : to be connect to the icecast server as an admin
+Returns a hash table of alls connected sources / listeners
+$my_session->sources()
+$my_session->listeners()
 
-$my_session->sources() : returns you a hash table of alls connected sources
-
-$my_session->listeners() :returns you a hash table of alls connected listeners
-
-$my_session->set("bla bla") : sends "set bla bla\n" to the server
-
-$my_session->modify("bla bla") : sends "modify bla bla\n" to the server
-
-$my_session->allow("bla bla") : sends "allow bla bla\n" to the server, but you can't do "allow ... list"
-
-$my_session->deny("bla bla") : sends "deny bla bla\n" to the server, but you can't do "deny ... list"
-
-$my_session->kick("bla bla") : sends "kick bla bla\n" to the server
-
-$my_session->selection("bla bla") : sends "select bla bla\n" to the server
-
-$my_session->alias("bla bla") : sends "alias bla bla\n" to the server
-
-$my_session->dir("bla bla") : sends "dir bla bla\n" to the server
-
-$my_session->touch("bla bla") : sends "touch bla bla\n" to the server
-
-$my_session->status("bla bla") : sends "status bla bla\n" to the server
-
-$my_session->debus("bla bla") : sends "debug bla bla\n" to the server
+Differents methods
+$my_session->set()
+$my_session->modify()
+$my_session->allow() you can't do "allow ... list"
+$my_session->deny() you can't do "deny ... list"
+$my_session->kick()
+$my_session->selection()
+$my_session->alias()
+$my_session->dir()
+$my_session->touch()
+$my_session->status()
+$my_session->debug()
 
 =head1 EXAMPLE
 
 First of all you have to run your icecast server, run a source encoder, and a client
-(to do this take a look at the doc). Then execute, in a perl programm, this:
+(to do this take a look at the doc). Then execute this code in a perl programm:
 
 #Programme gives you informations about the clients and sources in your icecast server
 
@@ -547,17 +538,15 @@ foreach $key (keys %clients)
   }
 
 #And if you want to change the admin_password 
-
 #$session->set("admin_password my_new_password");
 
 #or client_password:
-
 #$session->set("client_password secret_password");
 
-#And you can test the other functions in the same way 
+#And you can test other functions with the same way 
 #that you test this one!
 
-#Isn't it very simple to use it :).
+#Isn't it very simple to use it :)
 
 =head1 AUTHOR
 
