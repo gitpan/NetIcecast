@@ -432,39 +432,47 @@ sub debug
 1;
 __END__
 
+
 =head1 NAME
   
 Net::Icecast - Object oriented functions to run your icecast server.
 
+
 =head1 SYNOPSIS
   
-use Net::Icecast;
+require Net::Icecast;
+
 
 =head1 DESCRIPTION
 
-The commands you're used to find in a icecast server are 
-in this module (Not alls but only the ones i needed!).They can permit
-you to create programs which configure your icecast server.
+WARNING!!! This module can only be use if your icecast server is older than version 1.3.7
+
+The commands you're used to find in a icecast server are in this module (Not alls but only the ones i needed!).
+They can permit you to create programs which configure your icecast server.
 If you find that there are importants functions that need to be add,
 as i said before, you can modify it under the same terms as Perl itself!
 (If you want more details about the functions see
 the icecast commands doc) 
+
 So good fun...
 
 =head1 OBJECTS
 
 (be careful with the orthography of the objects, the orthography is the same that the icecast's commands)
 
-Sources object :
+=over 3
+
+=item Sources object :
 Properties:
 id : source's id
 host : source's host
-mountpoint : source's mountpoint
+
+=item mountpoint : source's mountpoint
 connect for : time of connection of the source 
 ip : source's ip
 song : song sends by the source
 
-Listeners object :
+=item Listeners object :
 Properties:
 id : listener's id
 host : listener's host
@@ -472,23 +480,37 @@ mountpoint : listener's mountpoint
 connect for : time of connection of the listener 
 source_id : listener's source id.
 
+=back
+
 =head1 METHODS
 
 Net::Icecast->new($host,$port,$admin_password) : to be connect to the icecast server as an admin
-$my_session->sources() : returns you a hash table of alls connected sources
-$my_session->listeners() :returns you a hash table of alls connected listeners
-$my_session->set("bla bla") : sends "set bla bla\n" to the server
-$my_session->modify("bla bla") : sends "modify bla bla\n" to the server
-$my_session->allow("bla bla") : sends "allow bla bla\n" to the server, but you can't do "allow ... list"
-$my_session->deny("bla bla") : sends "deny bla bla\n" to the server, but you can't do "deny ... list"
-$my_session->kick("bla bla") : sends "kick bla bla\n" to the server
-$my_session->selection("bla bla") : sends "select bla bla\n" to the server
-$my_session->alias("bla bla") : sends "alias bla bla\n" to the server
-$my_session->dir("bla bla") : sends "dir bla bla\n" to the server
-$my_session->touch("bla bla") : sends "touch bla bla\n" to the server
-$my_session->status("bla bla") : sends "status bla bla\n" to the server
-$my_session->debus("bla bla") : sends "debug bla bla\n" to the server
 
+$my_session->sources() : returns you a hash table of alls connected sources
+
+$my_session->listeners() :returns you a hash table of alls connected listeners
+
+$my_session->set("bla bla") : sends "set bla bla\n" to the server
+
+$my_session->modify("bla bla") : sends "modify bla bla\n" to the server
+
+$my_session->allow("bla bla") : sends "allow bla bla\n" to the server, but you can't do "allow ... list"
+
+$my_session->deny("bla bla") : sends "deny bla bla\n" to the server, but you can't do "deny ... list"
+
+$my_session->kick("bla bla") : sends "kick bla bla\n" to the server
+
+$my_session->selection("bla bla") : sends "select bla bla\n" to the server
+
+$my_session->alias("bla bla") : sends "alias bla bla\n" to the server
+
+$my_session->dir("bla bla") : sends "dir bla bla\n" to the server
+
+$my_session->touch("bla bla") : sends "touch bla bla\n" to the server
+
+$my_session->status("bla bla") : sends "status bla bla\n" to the server
+
+$my_session->debus("bla bla") : sends "debug bla bla\n" to the server
 
 =head1 EXAMPLE
 
@@ -496,30 +518,45 @@ First of all you have to run your icecast server, run a source encoder, and a cl
 (to do this take a look at the doc). Then execute, in a perl programm, this:
 
 #Programme gives you informations about the clients and sources in your icecast server
+
 #!/usr/bin/perl
+
 require Icecast;
 
 my $session = Net::Icecast->new("icecast.computer.host",$port?,"ADMIN_Password");
-$session->set_oper("OPER_Password\n");
+
+$session->set_oper("OPER_Password");
+
 my %sources = $session->sources;
+
 print "Sources:\n";
+
 foreach $key (keys %sources)
   {
-#If you want you print the IP address, the song title, mount point...
+    #To print the IP address, ...
     print "Id : $key, host : $sources{$key}->{host}\n";
   }
+
 my %clients = $session->listeners;
 print "Clients:\n";
+
 foreach $key (keys %clients)
   {
-#If you want you print the source id, the mount point...
+    #To print the source id, the mount point...
     print "Id : $key, host : $clients{$key}->{host}\n";
   }
 
-#And if you want to change the admin_password or client_password:
+#And if you want to change the admin_password 
+
 #$session->set("admin_password my_new_password");
+
+#or client_password:
+
 #$session->set("client_password secret_password");
-#And you can test the other functions in the same way that you test this one!
+
+#And you can test the other functions in the same way 
+#that you test this one!
+
 #Isn't it very simple to use it :).
 
 =head1 AUTHOR
